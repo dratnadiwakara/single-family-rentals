@@ -1,14 +1,7 @@
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.options import Options
-from selenium.webdriver.support.ui import Select
 from selenium.webdriver.common.by import By
-import gc
-import pandas as pd
 import time
-from datetime import datetime, timedelta
-import os
-import PyPDF2
 import gspread
 
 sa = gspread.service_account(filename='C:/Users/Dimuthu/Documents/LK Economic Indicators/data_processing/'
