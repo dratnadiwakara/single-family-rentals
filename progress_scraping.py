@@ -3,6 +3,7 @@ from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
 import time
 import gspread
+from datetime import datetime
 
 sa = gspread.service_account(filename='C:/Users/Dimuthu/Documents/LK Economic Indicators/data_processing/'
                                       'lk-indicators-585e699aa78d.json')
@@ -54,14 +55,21 @@ with open('progress_links.txt') as file:
 
 
 for line in lines:
-    driver = webdriver.Firefox(options=options,
-                               executable_path=r'C:\Users\Dimuthu\cse2022\cse2022\scripts\geckodriver.exe')
-    driver.get(line)
-    time.sleep(10)
     print(line)
-    addresses = driver.find_elements(By.CLASS_NAME, 'property-address')
-    f = open('progress_addresses.txt', 'a')
-    for add in addresses:
-        f.write(line+"|"+add.text + "\n")
-    f.close()
-    driver.close()
+    try:
+        driver = webdriver.Firefox(options=options,
+                                   executable_path=r'C:\Users\Dimuthu\cse2022\cse2022\scripts\geckodriver.exe')
+        driver.get(line)
+        time.sleep(10)
+        listings = driver.find_elements(By.CLASS_NAME, 'property-info-container')
+
+        f = open('progress_addresses.txt', 'a')
+        for list_item in listings:
+            f.write(line+"|"+list_item.find_element(By.CLASS_NAME,'property-address').text +"|"+
+                    list_item.find_element(By.CLASS_NAME,'price').text.replace('\n',',')+"|"+
+                    list_item.find_element(By.CLASS_NAME,'room-list').text.replace('\n',',') + "|"+
+                    datetime.today().strftime('%Y-%m-%d') + "\n")
+        f.close()
+        driver.close()
+    except:
+        print(' failed')

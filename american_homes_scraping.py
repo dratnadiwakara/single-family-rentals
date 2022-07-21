@@ -2,7 +2,7 @@ from selenium import webdriver
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
 import time
-import gspread
+from datetime import datetime
 
 options = Options()
 options.binary_location = r'C:\Program Files\Mozilla Firefox\firefox.exe'
@@ -46,7 +46,8 @@ with open('american_homes_links.txt', 'w') as f:
 
 with open('american_homes_links.txt') as f:
     links = f.read().splitlines()
-
+links = list(set(links))
+links.sort()
 
 driver = webdriver.Firefox(options=options,
                            executable_path=r'C:\Users\Dimuthu\cse2022\cse2022\scripts\geckodriver.exe')
@@ -89,11 +90,15 @@ for link in links:
                 time.sleep(1)
             except:
                 pass
-        addresses = driver.find_elements(By.XPATH, "//div[contains(@class, 'container')]//a[@rel='nofollow']")
-        if len(addresses) > 0:
-            f = open('american_addresses.txt', 'a')
-            for add in addresses:
-                f.write(add.text + "|" + add.get_attribute('href') + "|" + link + "\n")
+        listings = driver.find_elements(By.CLASS_NAME,'flex-1.ml-2px')
+        if len(listings) > 0:
+            f = open('american_addresses_new.txt', 'a')
+            for list_item in listings:
+                f.write(list_item.find_element(By.CSS_SELECTOR,'a').text + "|" +
+                        list_item.find_element(By.CSS_SELECTOR,'a').get_attribute('href') + "|" +
+                        list_item.find_element(By.CLASS_NAME, 'text-green-teal.text-body.font-semibold').text+ "|" +
+                        list_item.find_element(By.XPATH, "//div[@data-testid='features']").text.replace("\n", ",")+ "|" +
+                        datetime.today().strftime('%Y-%m-%d') + "\n")
             f.close()
     except:
         pass
